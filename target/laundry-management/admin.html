@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Admin - Cyron's Laundry</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        html, body {
+            height: 100%;
+            min-height: 100vh;
+        }
+
+        body {
+            background: #d4edff;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 0;
+            margin: 0;
+        }
+
+        .main-wrapper {
+            width: 100%;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* ===== TOP BAR ===== */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+            width: 100%;
+            background: transparent;
+            flex-shrink: 0;
+            padding: 0 4px;
+        }
+
+        .top-bar .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #0f2b3a;
+            cursor: default;
+            padding: 6px 14px 6px 10px;
+            border-radius: 40px;
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(4px);
+            transition: 0.15s;
+        }
+        .top-bar .user-info i {
+            font-size: 1.6rem;
+            color: #0f2b3a;
+        }
+
+        .logout-btn {
+            font-size: 0.75rem;
+            color: #0f2b3a;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(4px);
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-weight: 600;
+            transition: 0.15s;
+            white-space: nowrap;
+            border: none;
+            cursor: pointer;
+        }
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        /* ===== TITLE ===== */
+        .page-title {
+            text-align: center;
+            margin-bottom: 16px;
+            flex-shrink: 0;
+            padding: 0 4px;
+        }
+        .page-title h2 {
+            color: #0f2b3a;
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+        .page-title .sub-title {
+            color: #0f2b3a;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* ===== CONTAINER ===== */
+        .container {
+            width: 100%;
+            background: white;
+            border-radius: 30px;
+            padding: 24px 20px 20px 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.10);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== NOTIFICATION ===== */
+        .notification {
+            padding: 10px 14px;
+            border-radius: 12px;
+            margin-bottom: 14px;
+            font-size: 0.85rem;
+            color: #0f2b3a;
+            display: none;
+            flex-shrink: 0;
+        }
+        .notification.show {
+            display: block;
+        }
+        .notification.error {
+            background: #FFEBEE;
+        }
+        .notification.success {
+            background: #E8F5E9;
+        }
+
+        /* ===== NAVIGATION ===== */
+        .nav-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 16px;
+            width: 100%;
+            flex-shrink: 0;
+        }
+        .btn-scroll {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            flex: 1;
+            padding: 4px 0;
+            align-items: center;
+            border-radius: 60px;
+            scroll-behavior: smooth;
+        }
+        .btn-scroll::-webkit-scrollbar {
+            display: none;
+        }
+        .btn-scroll .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 60px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: white;
+            color: #0f2b3a;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            flex-shrink: 0;
+            transition: 0.2s;
+            white-space: nowrap;
+            border: 2px solid #dce6ed;
+        }
+        .btn-scroll .btn i {
+            margin-right: 6px;
+        }
+        .btn-scroll .btn:hover {
+            background: #eef3f7;
+            transform: translateY(-2px);
+        }
+        .btn-scroll .btn.active {
+            background: #1f6f8a;
+            color: white;
+            border-color: #1f6f8a;
+        }
+
+        .nav-arrow {
+            background: rgba(255,255,255,0.8);
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #0f2b3a;
+            cursor: pointer;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.15s;
+            backdrop-filter: blur(4px);
+        }
+        .nav-arrow:hover {
+            background: rgba(255,255,255,0.95);
+        }
+        .nav-arrow:active {
+            transform: scale(0.92);
+        }
+
+        /* ===== SECTIONS ===== */
+        .section {
+            display: none;
+            width: 100%;
+            flex: 1;
+        }
+        .section.active {
+            display: block;
+        }
+
+        /* ===== FORM CARD ===== */
+        .form-card {
+            width: 100%;
+            background: #f8fbfd;
+            border-radius: 18px;
+            padding: 18px 16px;
+            border: 1px solid #e8eef2;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .form-card h3 {
+            font-size: 0.95rem;
+            color: #0f2b3a;
+            margin-bottom: 12px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        /* ===== PRICING ===== */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin: 8px 0 12px;
+        }
+        .pricing-item {
+            background: white;
+            padding: 10px 6px;
+            border-radius: 16px;
+            border: 1px solid #dce6ed;
+            text-align: center;
+        }
+        .pricing-item label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #0f2b3a;
+        }
+        .pricing-item input {
+            width: 70px;
+            padding: 4px 6px;
+            border-radius: 40px;
+            border: 1px solid #dce6ed;
+            text-align: center;
+            margin-top: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: #1a8c4a;
+            color: white;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 60px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.2s;
+            margin-top: 4px;
+            box-shadow: 0 4px 16px rgba(26, 140, 74, 0.2);
+            flex-shrink: 0;
+        }
+        .btn-primary:hover {
+            background: #14753d;
+            box-shadow: 0 8px 24px rgba(26, 140, 74, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .message {
+            margin-top: 8px;
+            font-size: 0.85rem;
+            text-align: center;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        /* ===== TABLES ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin-top: 4px;
+            border-radius: 16px;
+            flex: 1;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+            min-width: 280px;
+        }
+        th, td {
+            padding: 8px 10px;
+            border: 1px solid #e8eef2;
+            text-align: left;
+        }
+        th {
+            background: #eef3f7;
+            font-weight: 600;
+            color: #0f2b3a;
+        }
+        td {
+            background: white;
+        }
+
+        .badge {
+            padding: 3px 12px;
+            border-radius: 40px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: white;
+            text-transform: capitalize;
+        }
+        .badge.pending { background: #b8860b; }
+        .badge.ongoing { background: #1f6f8a; }
+        .badge.completed { background: #1a8c4a; }
+        .badge.pickup { background: #6a1b9a; }
+        .badge.delivered { background: #2e7d32; }
+
+        .action-btn {
+            padding: 4px 14px;
+            border: none;
+            border-radius: 40px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: white;
+            transition: 0.15s;
+        }
+        .action-btn.start { background: #1f6f8a; }
+        .action-btn.start:hover { background: #185a72; }
+        .action-btn.complete { background: #1a8c4a; }
+        .action-btn.complete:hover { background: #14753d; }
+        .action-btn.pickup { background: #6a1b9a; }
+        .action-btn.pickup:hover { background: #4a148c; }
+        .action-btn.deliver { background: #2e7d32; }
+        .action-btn.deliver:hover { background: #1b5e20; }
+
+        .footer-note {
+            margin-top: 14px;
+            font-size: 0.75rem;
+            color: #6f8fa2;
+            text-align: center;
+            border-top: 1px solid #eef3f7;
+            padding-top: 12px;
+            flex-shrink: 0;
+        }
+
+        /* ===== POPUP NOTIFICATION ===== */
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .popup-overlay.show {
+            display: flex;
+        }
+        .popup-box {
+            background: white;
+            border-radius: 28px;
+            max-width: 340px;
+            width: 100%;
+            padding: 32px 24px 24px;
+            text-align: center;
+            animation: popIn 0.2s ease;
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.85); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .popup-box .icon {
+            font-size: 3.5rem;
+            margin-bottom: 12px;
+        }
+        .popup-box .icon.success { color: #1a8c4a; }
+        .popup-box .icon.error { color: #c62828; }
+        .popup-box h3 {
+            font-size: 1.2rem;
+            color: #0f2b3a;
+            margin-bottom: 6px;
+        }
+        .popup-box p {
+            color: #4f6f82;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+        .popup-box .btn-ok {
+            background: #1f6f8a;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 60px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .popup-box .btn-ok:hover {
+            background: #185a72;
+        }
+
+        /* ===== CONFIRM DIALOG ===== */
+        .confirm-dialog {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(4px);
+            z-index: 1001;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .confirm-dialog.show {
+            display: flex;
+        }
+        .confirm-dialog .dialog-box {
+            background: white;
+            border-radius: 28px;
+            max-width: 340px;
+            width: 100%;
+            padding: 32px 24px 24px;
+            text-align: center;
+            animation: popIn 0.2s ease;
+        }
+        .confirm-dialog .dialog-box h4 {
+            font-size: 1.1rem;
+            color: #0f2b3a;
+            margin-bottom: 6px;
+        }
+        .confirm-dialog .dialog-box p {
+            color: #4f6f82;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+        .confirm-dialog .dialog-box .btn-row {
+            display: flex;
+            gap: 12px;
+        }
+        .confirm-dialog .dialog-box .btn-row .btn {
+            flex: 1;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 60px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.15s;
+        }
+        .confirm-dialog .dialog-box .btn-row .btn-cancel {
+            background: #eef3f7;
+            color: #0f2b3a;
+        }
+        .confirm-dialog .dialog-box .btn-row .btn-cancel:hover {
+            background: #dce6ed;
+        }
+        .confirm-dialog .dialog-box .btn-row .btn-confirm {
+            background: #1f6f8a;
+            color: white;
+        }
+        .confirm-dialog .dialog-box .btn-row .btn-confirm:hover {
+            background: #185a72;
+        }
+
+        /* ===== MOBILE FULL WIDTH ===== */
+        @media (max-width: 700px) {
+            .main-wrapper {
+                max-width: 100%;
+                padding: 16px;
+                margin: 0;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .main-wrapper { padding: 12px; }
+            .container { padding: 18px 14px; border-radius: 24px; }
+            .top-bar .user-info { font-size: 0.9rem; padding: 4px 10px; }
+            .top-bar .user-info i { font-size: 1.3rem; }
+            .page-title h2 { font-size: 1.3rem; }
+            .btn-scroll .btn { padding: 8px 14px; font-size: 0.7rem; }
+            .nav-arrow { width: 32px; height: 32px; font-size: 0.9rem; }
+        }
+
+        @media (max-width: 450px) {
+            .main-wrapper { padding: 8px; }
+            .container { padding: 14px 10px; border-radius: 20px; }
+            .top-bar .user-info { font-size: 0.8rem; padding: 4px 8px; }
+            .top-bar .user-info i { font-size: 1.1rem; }
+            .logout-btn { font-size: 0.65rem; padding: 4px 12px; }
+            .page-title h2 { font-size: 1.1rem; }
+            .btn-scroll { gap: 6px; }
+            .btn-scroll .btn { font-size: 0.65rem; padding: 6px 12px; }
+            .nav-arrow { width: 28px; height: 28px; font-size: 0.8rem; }
+            .pricing-grid { gap: 6px; }
+            .pricing-item input { width: 60px; }
+            table { font-size: 0.7rem; }
+            th, td { padding: 5px 6px; }
+        }
+
+        @media (max-width: 380px) {
+            .main-wrapper { padding: 4px; }
+            .container { padding: 10px 8px; border-radius: 16px; }
+            .btn-scroll .btn { font-size: 0.6rem; padding: 4px 10px; }
+            .nav-arrow { width: 24px; height: 24px; font-size: 0.7rem; }
+            .form-card { padding: 12px 10px; }
+        }
+    </style>
+</head>
+<body>
+<div class="main-wrapper">
+
+    <!-- ===== TOP BAR ===== -->
+    <div class="top-bar">
+        <div class="user-info">
+            <i class="fas fa-user-shield"></i>
+            <span id="adminNameDisplay">Admin</span>
+        </div>
+        <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+
+    <!-- ===== TITLE ===== -->
+    <div class="page-title">
+        <h2>🧺 Admin Panel</h2>
+        <p class="sub-title">Manage orders & pricing</p>
+    </div>
+
+    <!-- ===== CONTAINER ===== -->
+    <div class="container">
+
+        <div id="adminNotification" class="notification"></div>
+
+        <!-- ===== NAVIGATION ===== -->
+        <div class="nav-wrapper">
+            <button class="nav-arrow" id="scrollLeftBtn"><</button>
+            <div class="btn-scroll" id="btnScroll">
+                <button class="btn active" data-section="pricing"><i class="fas fa-tag"></i> Pricing</button>
+                <button class="btn" data-section="pending"><i class="fas fa-clock"></i> Pending</button>
+                <button class="btn" data-section="ongoing"><i class="fas fa-spinner"></i> Ongoing</button>
+                <button class="btn" data-section="pickup"><i class="fas fa-truck"></i> For Pickup</button>
+                <button class="btn" data-section="delivered"><i class="fas fa-check-double"></i> Delivered</button>
+            </div>
+            <button class="nav-arrow" id="scrollRightBtn">></button>
+        </div>
+
+        <!-- ===== PRICING ===== -->
+        <div id="section-pricing" class="section active" style="flex: 1;">
+            <div class="form-card">
+                <h3><i class="fas fa-tag"></i> Set Pricing</h3>
+                <div class="pricing-grid">
+                    <div class="pricing-item">
+                        <label>Wash</label>
+                        <input type="number" id="priceWash" value="50" step="5" />
+                    </div>
+                    <div class="pricing-item">
+                        <label>Dry</label>
+                        <input type="number" id="priceDry" value="30" step="5" />
+                    </div>
+                    <div class="pricing-item">
+                        <label>Fold</label>
+                        <input type="number" id="priceFold" value="20" step="5" />
+                    </div>
+                </div>
+                <button class="btn-primary" id="updatePricingBtn"><i class="fas fa-save"></i> Update Pricing</button>
+                <div id="pricingMessage" class="message"></div>
+                <div style="flex: 1;"></div>
+            </div>
+        </div>
+
+        <!-- ===== PENDING ===== -->
+        <div id="section-pending" class="section" style="flex: 1;">
+            <div class="form-card">
+                <h3><i class="fas fa-clock"></i> Pending Orders</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>#</th><th>Customer</th><th>Services</th><th>Action</th></tr></thead>
+                        <tbody id="pendingTableBody"><tr><td colspan="4" style="text-align:center;color:#6f8fa2;">None</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== ONGOING ===== -->
+        <div id="section-ongoing" class="section" style="flex: 1;">
+            <div class="form-card">
+                <h3><i class="fas fa-spinner"></i> Ongoing</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>#</th><th>Customer</th><th>Services</th><th>Action</th></tr></thead>
+                        <tbody id="ongoingTableBody"><tr><td colspan="4" style="text-align:center;color:#6f8fa2;">None</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== FOR PICKUP ===== -->
+        <div id="section-pickup" class="section" style="flex: 1;">
+            <div class="form-card">
+                <h3><i class="fas fa-truck"></i> For Pickup</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>#</th><th>Customer</th><th>Services</th><th>Action</th></tr></thead>
+                        <tbody id="pickupTableBody"><tr><td colspan="4" style="text-align:center;color:#6f8fa2;">None</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== DELIVERED ===== -->
+        <div id="section-delivered" class="section" style="flex: 1;">
+            <div class="form-card">
+                <h3><i class="fas fa-check-double"></i> Delivered</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>#</th><th>Customer</th><th>Services</th><th>Status</th></tr></thead>
+                        <tbody id="deliveredTableBody"><tr><td colspan="4" style="text-align:center;color:#6f8fa2;">None</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-note">
+            <i class="fas fa-info-circle"></i> Manage all laundry orders from one place
+        </div>
+
+    </div>
+</div>
+
+<!-- ===== POPUP NOTIFICATION ===== -->
+<div class="popup-overlay" id="popupOverlay">
+    <div class="popup-box">
+        <div class="icon success" id="popupIcon"><i class="fas fa-check-circle"></i></div>
+        <h3 id="popupTitle">Success!</h3>
+        <p id="popupMessage">Action completed successfully.</p>
+        <button class="btn-ok" id="popupOkBtn">Okay</button>
+    </div>
+</div>
+
+<!-- ===== CONFIRM DIALOG ===== -->
+<div class="confirm-dialog" id="confirmDialog">
+    <div class="dialog-box">
+        <h4><i class="fas fa-exclamation-triangle" style="color:#b8860b;"></i> Confirm</h4>
+        <p id="confirmMessage">Move this order?</p>
+        <div class="btn-row">
+            <button class="btn btn-cancel" id="confirmCancel">Cancel</button>
+            <button class="btn btn-confirm" id="confirmOk">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ===== POPUP FUNCTION =====
+        function showPopup(message, title = 'Success!', type = 'success') {
+            const overlay = document.getElementById('popupOverlay');
+            const icon = document.getElementById('popupIcon');
+            const titleEl = document.getElementById('popupTitle');
+            const msgEl = document.getElementById('popupMessage');
+            
+            icon.className = 'icon ' + type;
+            if (type === 'success') {
+                icon.innerHTML = '<i class="fas fa-check-circle"></i>';
+            } else {
+                icon.innerHTML = '<i class="fas fa-exclamation-circle"></i>';
+            }
+            titleEl.textContent = title;
+            msgEl.textContent = message;
+            overlay.classList.add('show');
+        }
+
+        document.getElementById('popupOkBtn').addEventListener('click', function() {
+            document.getElementById('popupOverlay').classList.remove('show');
+        });
+
+        document.getElementById('popupOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('show');
+            }
+        });
+
+        // ===== HELPERS =====
+        function getOrders() {
+            return JSON.parse(localStorage.getItem('laundry_orders') || '[]');
+        }
+        function setOrders(orders) {
+            localStorage.setItem('laundry_orders', JSON.stringify(orders));
+        }
+        function getUsers() {
+            return JSON.parse(localStorage.getItem('laundry_users') || '[]');
+        }
+
+        // ===== LOGOUT =====
+        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            if (confirm('Logout from admin?')) {
+                localStorage.removeItem('current_customer_id');
+                window.location.href = 'index.html';
+            }
+        });
+
+        // ===== NAVIGATION SCROLL =====
+        const scrollContainer = document.getElementById('btnScroll');
+        document.getElementById('scrollLeftBtn').addEventListener('click', () => {
+            scrollContainer.scrollBy({ left: -140, behavior: 'smooth' });
+        });
+        document.getElementById('scrollRightBtn').addEventListener('click', () => {
+            scrollContainer.scrollBy({ left: 140, behavior: 'smooth' });
+        });
+
+        // ===== SECTION SWITCH =====
+        document.querySelectorAll('.btn-scroll .btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.btn-scroll .btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const section = this.dataset.section;
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                document.getElementById('section-' + section).classList.add('active');
+            });
+        });
+
+        // ===== PRICING =====
+        document.getElementById('updatePricingBtn').addEventListener('click', function() {
+            const wash = document.getElementById('priceWash').value;
+            const dry = document.getElementById('priceDry').value;
+            const fold = document.getElementById('priceFold').value;
+            
+            if (isNaN(wash) || isNaN(dry) || isNaN(fold) || wash < 0 || dry < 0 || fold < 0) {
+                showPopup('Please enter valid numbers.', 'Error!', 'error');
+                return;
+            }
+            
+            const pricing = { wash: parseFloat(wash), dry: parseFloat(dry), fold: parseFloat(fold) };
+            localStorage.setItem('laundry_pricing', JSON.stringify(pricing));
+            document.getElementById('pricingMessage').innerHTML = '<span style="color:#1a8c4a;">✅ Pricing updated!</span>';
+            showPopup('Pricing updated successfully!', 'Success!', 'success');
+        });
+
+        // ===== RENDER TABLES =====
+        function renderAdminTables() {
+            const orders = getOrders();
+            const users = getUsers();
+
+            // Pending
+            const pending = orders.filter(o => o.status === 'pending');
+            const pendingBody = document.getElementById('pendingTableBody');
+            if (pending.length === 0) {
+                pendingBody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#6f8fa2;">None</td></tr>';
+            } else {
+                pendingBody.innerHTML = pending.map(o => {
+                    const user = users.find(u => u.id == o.customerId) || { firstName: 'Unknown', lastName: '' };
+                    return `<tr><td>${o.queueNumber}</td><td>${user.firstName || 'C'} ${user.lastName || ''}</td><td>${o.services || ''}</td><td><button class="action-btn start" data-id="${o.id}" data-action="ongoing">▶ Start</button></td></tr>`;
+                }).join('');
+            }
+
+            // Ongoing
+            const ongoing = orders.filter(o => o.status === 'ongoing');
+            const ongoingBody = document.getElementById('ongoingTableBody');
+            if (ongoing.length === 0) {
+                ongoingBody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#6f8fa2;">None</td></tr>';
+            } else {
+                ongoingBody.innerHTML = ongoing.map(o => {
+                    const user = users.find(u => u.id == o.customerId) || { firstName: 'Unknown', lastName: '' };
+                    return `<tr><td>${o.queueNumber}</td><td>${user.firstName || 'C'} ${user.lastName || ''}</td><td>${o.services || ''}</td><td><button class="action-btn pickup" data-id="${o.id}" data-action="pickup">📦 For Pickup</button></td></tr>`;
+                }).join('');
+            }
+
+            // Pickup
+            const pickup = orders.filter(o => o.status === 'pickup');
+            const pickupBody = document.getElementById('pickupTableBody');
+            if (pickup.length === 0) {
+                pickupBody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#6f8fa2;">None</td></tr>';
+            } else {
+                pickupBody.innerHTML = pickup.map(o => {
+                    const user = users.find(u => u.id == o.customerId) || { firstName: 'Unknown', lastName: '' };
+                    return `<tr><td>${o.queueNumber}</td><td>${user.firstName || 'C'} ${user.lastName || ''}</td><td>${o.services || ''}</td><td><button class="action-btn deliver" data-id="${o.id}" data-action="delivered">✅ Delivered</button></td></tr>`;
+                }).join('');
+            }
+
+            // Delivered
+            const delivered = orders.filter(o => o.status === 'delivered');
+            const deliveredBody = document.getElementById('deliveredTableBody');
+            if (delivered.length === 0) {
+                deliveredBody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#6f8fa2;">None</td></tr>';
+            } else {
+                deliveredBody.innerHTML = delivered.map(o => {
+                    const user = users.find(u => u.id == o.customerId) || { firstName: 'Unknown', lastName: '' };
+                    return `<tr><td>${o.queueNumber}</td><td>${user.firstName || 'C'} ${user.lastName || ''}</td><td>${o.services || ''}</td><td><span class="badge delivered">Done</span></td></tr>`;
+                }).join('');
+            }
+
+            // Attach events
+            document.querySelectorAll('.action-btn.start, .action-btn.pickup, .action-btn.deliver').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = parseInt(this.dataset.id);
+                    const action = this.dataset.action;
+                    const order = getOrders().find(o => o.id == id);
+                    if (!order) return;
+                    
+                    let msg = '';
+                    if (action === 'ongoing') msg = `Start order #${order.queueNumber}?`;
+                    else if (action === 'pickup') msg = `Mark order #${order.queueNumber} as ready for pickup?`;
+                    else if (action === 'delivered') msg = `Mark order #${order.queueNumber} as delivered?`;
+                    
+                    showConfirmDialog(id, action, msg);
+                });
+            });
+        }
+
+        // ===== CONFIRM DIALOG =====
+        let pendingAction = null;
+
+        function showConfirmDialog(orderId, action, message) {
+            pendingAction = { orderId, action };
+            document.getElementById('confirmMessage').innerHTML = message;
+            document.getElementById('confirmDialog').classList.add('show');
+        }
+
+        document.getElementById('confirmCancel').addEventListener('click', function() {
+            document.getElementById('confirmDialog').classList.remove('show');
+            pendingAction = null;
+        });
+
+        document.getElementById('confirmOk').addEventListener('click', function() {
+            if (!pendingAction) return;
+            const { orderId, action } = pendingAction;
+            moveOrder(orderId, action);
+            document.getElementById('confirmDialog').classList.remove('show');
+            pendingAction = null;
+        });
+
+        document.getElementById('confirmDialog').addEventListener('click', function(e) {
+            if (e.target === this) { this.classList.remove('show'); pendingAction = null; }
+        });
+
+        function moveOrder(orderId, newStatus) {
+            const orders = getOrders();
+            const index = orders.findIndex(o => o.id == orderId);
+            if (index === -1) return;
+            orders[index].status = newStatus;
+            setOrders(orders);
+            renderAdminTables();
+            const q = orders[index].queueNumber;
+            showPopup('Order #' + q + ' updated to ' + newStatus.charAt(0).toUpperCase() + newStatus.slice(1) + '!', 'Success!', 'success');
+        }
+
+        // ===== SET ADMIN NAME =====
+        function setAdminName() {
+            const users = getUsers();
+            const admin = users.find(u => u.role === 'admin');
+            if (admin) {
+                document.getElementById('adminNameDisplay').textContent = admin.firstName + ' ' + admin.lastName;
+            }
+        }
+
+        // ===== INIT =====
+        function init() {
+            const users = getUsers();
+            if (!users.find(u => u.role === 'admin')) {
+                users.push({ id: 999, firstName: 'Admin', lastName: 'User', contact: 'admin', password: 'admin123', role: 'admin' });
+                localStorage.setItem('laundry_users', JSON.stringify(users));
+            }
+
+            if (!localStorage.getItem('laundry_pricing')) {
+                localStorage.setItem('laundry_pricing', JSON.stringify({ wash: 50, dry: 30, fold: 20 }));
+            }
+            const p = JSON.parse(localStorage.getItem('laundry_pricing'));
+            document.getElementById('priceWash').value = p.wash || 50;
+            document.getElementById('priceDry').value = p.dry || 30;
+            document.getElementById('priceFold').value = p.fold || 20;
+
+            let orders = getOrders();
+            if (orders.length === 0) {
+                orders = [
+                    { id: 1, customerId: 1, customerName: 'Juan Dela Cruz', services: 'Wash + Dry', serviceType: 'dropoff', status: 'pending', queueNumber: 1, createdAt: new Date().toLocaleString() },
+                    { id: 2, customerId: 1, customerName: 'Maria Santos', services: 'Fold', serviceType: 'pickup', status: 'ongoing', queueNumber: 2, createdAt: new Date().toLocaleString() },
+                    { id: 3, customerId: 1, customerName: 'Pedro Lopez', services: 'Wash + Fold', serviceType: 'dropoff', status: 'pickup', queueNumber: 3, createdAt: new Date().toLocaleString() },
+                    { id: 4, customerId: 1, customerName: 'Ana Reyes', services: 'Wash + Dry + Fold', serviceType: 'dropoff', status: 'delivered', queueNumber: 4, createdAt: new Date().toLocaleString() }
+                ];
+                setOrders(orders);
+            }
+
+            setAdminName();
+            renderAdminTables();
+        }
+
+        init();
+    })();
+</script>
+</body>
+</html>
